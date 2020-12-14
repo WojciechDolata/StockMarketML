@@ -21,7 +21,7 @@ def get_week_ahead(beg_date):
     return arr
     
 def predict_for_index(index):
-    orig_data = get_last_60d_data(index)
+    orig_data = get_last_ndays_data(index, 60)
 
     open_data = orig_data['Open'].values
 
