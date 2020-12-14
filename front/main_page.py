@@ -1,26 +1,30 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+from stock_data import *
 from predictor import *
 
-st.title('StockMarketML')
+def set_title():
+    st.title('StockMarketML')
 
-if st.button("Help."):
-    "1. Pick index."
-    "2. Press 'Predict' button."
-    "3. Enjoy our prediction report."
+def show_sidebar_help():
+    st.sidebar.header("How to use")
+    st.sidebar.write("""
+        1. Pick index. \n
+        2. Press 'Predict' button. \n
+        3. Enjoy our prediction report.""")
 
-selected_index = st.selectbox("Pick index", ["TSLA", "F"])
+def show_stock_details(stock):
+    st.image(stock.get_url(), width = 500)
+    st.header(stock.get_name())
+    st.subheader('NYSE, ' + stock.get_index())
+    st.write(stock.get_description())
 
-if st.button("Predict"):
-    
-    df_predicted = predict_for_index(selected_index)
-    df_previous_90 = get_last_ndays_data(selected_index, 90)['Open']
-    df_previous_14 = get_last_ndays_data(selected_index, 14)['Open']
+def show_report(stock):
+    df_predicted = predict_for_index(stock.get_index())
+    df_previous_90 = get_last_ndays_data(stock.get_index(), 90)['Open']
+    df_previous_14 = get_last_ndays_data(stock.get_index(), 14)['Open']
 
-
-
-    st.header('Report for stock: ' + selected_index +'\n')
 
     st.subheader('Values of this index in the last 3 months:')    
     previous_plt = alt.Chart(df_previous_90.reset_index()).mark_line().encode(
@@ -42,3 +46,17 @@ if st.button("Predict"):
         y=alt.Y('Open', scale=alt.Scale(zero=False))
     )
     st.write(predicted_plt)
+
+
+
+set_title()
+show_sidebar_help()
+
+selected_index = st.selectbox("Pick stock", ["Tesla", "Ford", "Apple"])
+
+if st.button("Predict"):
+    stock = get_by_name(selected_index)
+
+    show_stock_details(stock)
+    show_report(stock)
+
