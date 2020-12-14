@@ -1,1 +1,1 @@
-model_path = 'data/brain.h5'
+model_path = '../data/brain.h5'
