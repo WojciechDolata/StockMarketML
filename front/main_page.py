@@ -7,13 +7,6 @@ from predictor import *
 def set_title():
     st.title('StockMarketML')
 
-def show_sidebar_help():
-    st.sidebar.header("How to use")
-    st.sidebar.write("""
-        1. Pick index. \n
-        2. Press 'Predict' button. \n
-        3. Enjoy our prediction report.""")
-
 def show_stock_details(stock):
     st.image(stock.get_url(), width = 500)
     st.header(stock.get_name())
@@ -47,14 +40,34 @@ def show_report(stock):
     )
     st.write(predicted_plt)
 
+    # left align table values, css-y37zgl is the class of table div
+    st.markdown(
+        """<style>
+            .css-y37zgl {text-align: left !important}
+        </style>
+        """, unsafe_allow_html=True)
+
+
+    today_value = df_previous_14.values[df_previous_14.size - 1]
+    df_percentage_predicted = df_predicted.apply(lambda x: (x - today_value) / today_value * 100)
+
+    st.subheader('Predicted gain/loss (in %) compared to current stock value')
+    df_percentage_predicted = df_percentage_predicted.style.applymap(lambda x: 'color: red' if x <= 0 else 'color: green')
+    st.table(df_percentage_predicted)
 
 
 set_title()
-show_sidebar_help()
+# show_sidebar_help()
 
-selected_index = st.selectbox("Pick stock", ["Tesla", "Ford", "Apple"])
+st.sidebar.header("How to use")
+st.sidebar.write("""
+        1. Pick index. \n
+        2. Press 'Predict' button. \n
+        3. Enjoy our prediction report.""")
+st.sidebar.header("Pick stock")
+selected_index = st.sidebar.selectbox("", ["Tesla", "Ford", "Apple"])
 
-if st.button("Predict"):
+if st.sidebar.button("Predict"):
     stock = get_by_name(selected_index)
 
     show_stock_details(stock)
